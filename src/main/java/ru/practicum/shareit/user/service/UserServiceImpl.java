@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService {
         if (users.containsKey(id)) {
             return userMapper.toDTO(users.get(id));
         }
+
         throw new UserNotFoundException("User with id " + id + " not found");
     }
 }
