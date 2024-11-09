@@ -80,9 +80,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getAll() {
-        if (users == null && users.isEmpty()) {
-            return new ArrayList<>();
-        }
         return users.values()
                 .stream()
                 .map(userMapper::toDTO)
