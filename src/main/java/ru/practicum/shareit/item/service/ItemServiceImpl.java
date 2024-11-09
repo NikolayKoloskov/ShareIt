@@ -60,7 +60,9 @@ public class ItemServiceImpl implements ItemService {
             if (item.getAvailable().equals("false")) {
                 itemToUpdate.setAvailable(false);
             }
-            itemToUpdate.setAvailable(true);
+            if (item.getAvailable().equals("true")) {
+                itemToUpdate.setAvailable(true);
+            }
         }
         items.put(itemToUpdate.getId(), itemToUpdate);
         log.info("Обновлен предмет {}", item);
