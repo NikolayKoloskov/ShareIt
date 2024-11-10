@@ -24,7 +24,6 @@ public class UserServiceImpl implements UserService {
     private final Map<Integer, User> users = new HashMap<>();
     private int id = 0;
 
-
     @Override
     public UserDTO create(User user) {
         id++;
