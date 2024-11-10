@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DublicatedDataException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserDTO;
@@ -20,6 +21,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
+
+    private final ItemService itemService;
+
     private final UserMapper userMapper;
     private final Map<Integer, User> users = new HashMap<>();
     private int id = 0;
@@ -70,6 +74,7 @@ public class UserServiceImpl implements UserService {
         if (!users.containsKey(id)) {
             throw new UserNotFoundException("Пользователь с id " + id + " не найден.");
         }
+        itemService.deleteByUserId(id);
         users.remove(id);
         if (!users.containsKey(id)) {
             return "{\n \"message\": \"Пользователь удален\" \n}";
