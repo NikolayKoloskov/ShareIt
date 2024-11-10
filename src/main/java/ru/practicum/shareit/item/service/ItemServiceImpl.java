@@ -70,8 +70,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDTO delete(ItemDTO item) {
-        return null;
+    public void delete(ItemDTO item) {
+        if (items.containsKey(item.getId())){
+            items.remove(item.getId());
+        }
+    }
+
+    @Override
+    public void deleteByUserId(int userId) {
+        log.info("Удаление предметов по userId: {}", userId);
+        userService.getById(userId);
+        items.values().removeIf(item -> item.getOwner() == userId);
     }
 
     @Override
