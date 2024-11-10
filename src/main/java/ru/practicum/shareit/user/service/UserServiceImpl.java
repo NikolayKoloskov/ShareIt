@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DublicatedDataException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserDTO;
