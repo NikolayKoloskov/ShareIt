@@ -71,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void delete(ItemDTO item) {
-        if (items.containsKey(item.getId())){
+        if (items.containsKey(item.getId())) {
             items.remove(item.getId());
         }
     }
