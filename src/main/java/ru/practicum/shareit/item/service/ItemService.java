@@ -9,10 +9,6 @@ public interface ItemService {
 
     ItemDTO update(ItemDTO item);
 
-    void delete(ItemDTO item);
-
-    void deleteByUserId(int userId);
-
     ItemDTO findById(int id);
 
     List<ItemDTO> findAll();
