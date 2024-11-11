@@ -39,12 +39,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDTO> findAll() {
-        itemStorage.findAll();
-        return itemStorage.findAll().stream().map(itemMapper::toDTO).toList();
-    }
-
-    @Override
     public List<ItemDTO> findByUserId(int userId) {
         log.info("Поиск предметов по userId: {}", userId);
         userService.getById(userId);

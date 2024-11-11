@@ -11,8 +11,6 @@ public interface ItemService {
 
     ItemDTO findById(int id);
 
-    List<ItemDTO> findAll();
-
     List<ItemDTO> findByUserId(int userId);
 
     List<ItemDTO> findByText(String text);
