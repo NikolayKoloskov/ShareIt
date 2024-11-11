@@ -60,8 +60,8 @@ public class InMemoryUserStorage implements UserStorage {
         User userToUpdate = users.get(user.getId());
         log.info("Обновление пользователя {} на {}", userToUpdate, user);
         if (user.getEmail() != null) {
-            if (users.values().stream().
-                    filter(u -> u.getId() != userToUpdate.getId())
+            if (users.values().stream()
+                    .filter(u -> u.getId() != userToUpdate.getId())
                     .map(User::getEmail)
                     .anyMatch(email -> email.equals(user.getEmail()))
             ) {
