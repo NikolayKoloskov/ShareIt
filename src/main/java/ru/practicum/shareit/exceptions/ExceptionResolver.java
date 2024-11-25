@@ -26,6 +26,13 @@ public class ExceptionResolver {
         return new ErrorResponseMessage("User not found", e.getMessage());
     }
 
+    @ExceptionHandler(ItemNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponseMessage handleItemNotFoundException(ItemNotFoundException e) {
+        log.error(e.getMessage());
+        return new ErrorResponseMessage("Item not found", e.getMessage());
+    }
+
     @ExceptionHandler(DublicatedDataException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponseMessage handleDublicatedUserException(DublicatedDataException e) {
@@ -68,5 +75,12 @@ public class ExceptionResolver {
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     public ErrorResponseMessage handleForbiddenException(ForbiddenException e) {
         return new ErrorResponseMessage("Доступ запрещен", e.getMessage());
+    }
+
+    @ExceptionHandler(NotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseMessage notValidExceptionHandler(NotValidException e) {
+        log.error("not valid exception - {} ({})", e.getMessage(), e.getStackTrace()[0].toString());
+        return new ErrorResponseMessage("BadRequest", e.getMessage());
     }
 }
