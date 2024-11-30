@@ -9,9 +9,9 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exceptions.ForbiddenException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.NotValidException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -153,7 +153,7 @@ public class BookingServiceImpl implements BookingService {
 
     private User getUserById(int userId) {
         return userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+                () -> new ForbiddenException("Пользователь с ID " + userId + " не найден"));
     }
 
     private Item getItemById(int itemId) {
