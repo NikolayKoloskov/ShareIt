@@ -38,8 +38,11 @@ public class BookingServiceImpl implements BookingService {
         if (!item.isAvailable()) {
             throw new NotValidException(Item.class, "Не доступно для бронирования");
         }
-
         Booking booking = bookingMapper.map(bookingSaveDto);
+        if (booking.getStart().isAfter(booking.getEnd())) {
+            throw new NotValidException(Booking.class,
+                    "Дата начала бронирования не может быть позже конца бронирования.");
+        }
         booking.setBooker(user);
         booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
@@ -51,7 +54,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto manageBooking(int userId, int bookingId, boolean approved) {
-        log.info("Запрос на изменение бронирования по id - {}", bookingId);
+        log.info("Запрос на изменение бронирования по id - {}, Пользователем userId - {} и статусом - {}", bookingId, userId, approved);
+        getUserById(userId);
         Booking booking = getBookingById(bookingId);
         log.info("Бронирование для изменения - {}", booking);
         if (booking.getItem().getOwner().getId() != userId) {
@@ -66,7 +70,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto getBooking(int userId, int bookingId) {
         log.info("Запрос на получение бронирования по id - {}", bookingId);
-        User user = getUserById(userId);
+        getUserById(userId);
         Booking booking = getBookingById(bookingId);
         log.info("Бронирование найдено - {}", booking);
         if (booking.getItem().getOwner().getId() != userId && booking.getBooker().getId() != userId) {
@@ -80,6 +84,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingDto> getAllUserBookings(int userId, BookingState state) {
         log.info("Запрос на получение всех бронирований по id - {}", userId);
+        getUserById(userId);
         final Collection<Booking> bookings;
         final LocalDateTime current = LocalDateTime.now();
         switch (state) {
@@ -112,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingDto> getAllUserItemsBookings(int userId, BookingState state) {
         log.info("Запрос на получение всех бронирований по userId - {}", userId);
-        User user = getUserById(userId);
+        getUserById(userId);
         Collection<Integer> itemIds = itemRepository.findAllByOwnerId(userId).stream()
                 .map(Item::getId)
                 .toList();
