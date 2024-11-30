@@ -26,8 +26,22 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     @Query("SELECT b from Booking AS b " +
             "WHERE b.booker.id = ?1 " +
             "AND ?2 > b.start " +
-            "AND ?2 < b.end")
+            "AND ?2 < b.end ")
     Collection<Booking> findAllCurrentBookings(int bookerId, LocalDateTime time);
 
     Collection<Booking> findAllByBookerIdAndStatusOrderByStartDesc(int bookerId, BookingStatus status);
+
+    Collection<Booking> findAllByItemIdInAndStatusOrderByStartDesc(Collection<Integer> itemIds, BookingStatus status);
+
+    Collection<Booking> findAllByItemIdInOrderByStartDesc(Collection<Integer> itemIds);
+
+    Collection<Booking> findAllByItemIdInAndStartAfterOrderByStartDesc(Collection<Integer> itemIds, LocalDateTime time);
+
+    Collection<Booking> findAllByItemIdInAndEndBeforeOrderByStartDesc(Collection<Integer> itemIds, LocalDateTime time);
+
+    @Query("SELECT b from Booking AS b " +
+            "WHERE b.item.id in ?1 " +
+            "AND ?2 > b.start " +
+            "AND ?2 < b.end ")
+    Collection<Booking> findAllCurrentBookings(Collection<Integer> itemIds, LocalDateTime time);
 }

@@ -31,12 +31,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto addBooking(int userId, BookingSaveDto bookingSaveDto) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
-
+        log.info("Запрос на добавление бронирования userId - {}, bookingSaveDto - {}", userId, bookingSaveDto);
+        User user = getUserById(userId);
         int itemId = bookingSaveDto.getItemId();
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new ItemNotFoundException("Предмет с ID " + itemId + " не найден"));
+        Item item = getItemById(itemId);
         if (!item.isAvailable()) {
             throw new NotValidException(Item.class, "Не доступно для бронирования");
         }
@@ -46,33 +44,34 @@ public class BookingServiceImpl implements BookingService {
         booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
         Booking savedBooking = bookingRepository.save(booking);
-        log.info("booking saved to repo - {}", savedBooking);
+        log.info("Сохраненное создание бронирования - {}", savedBooking);
 
         return bookingMapper.map(savedBooking);
     }
 
     @Override
     public BookingDto manageBooking(int userId, int bookingId, boolean approved) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new ItemNotFoundException("Бронирование  с ID " + bookingId + " не найдено"));
-
+        log.info("Запрос на изменение бронирования по id - {}", bookingId);
+        Booking booking = getBookingById(bookingId);
+        log.info("Бронирование для изменения - {}", booking);
         if (booking.getItem().getOwner().getId() != userId) {
             throw new NotValidException(Booking.class, "Только владелец может изменять бронирование");
         }
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
         Booking savedBooking = bookingRepository.save(booking);
-
+        log.info("Сохранение бронирования - {}", savedBooking);
         return bookingMapper.map(savedBooking);
     }
 
     @Override
     public BookingDto getBooking(int userId, int bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new ItemNotFoundException("Бронирование  с ID " + bookingId + " не найдено"));
-
+        log.info("Запрос на получение бронирования по id - {}", bookingId);
+        User user = getUserById(userId);
+        Booking booking = getBookingById(bookingId);
+        log.info("Бронирование найдено - {}", booking);
         if (booking.getItem().getOwner().getId() != userId && booking.getBooker().getId() != userId) {
-            throw new NotValidException(Booking.class, "owner id " + booking.getItem().getOwner().getId() +
-                    " or booker id " + booking.getBooker().getId() + " does not match with user id " + userId);
+            throw new NotValidException(Booking.class,
+                    "Только владелец или человек оформивший бронирование может получить бронирование");
         }
 
         return bookingMapper.map(booking);
@@ -80,8 +79,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Collection<BookingDto> getAllUserBookings(int userId, BookingState state) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
-
+        log.info("Запрос на получение всех бронирований по id - {}", userId);
         final Collection<Booking> bookings;
         final LocalDateTime current = LocalDateTime.now();
         switch (state) {
@@ -107,18 +105,58 @@ public class BookingServiceImpl implements BookingService {
                 throw new NotValidException(BookingState.class, "invalid");
             }
         }
-
+        log.info("Все бронирования найдены - {}", bookings);
         return bookingMapper.map(bookings);
     }
 
     @Override
     public Collection<BookingDto> getAllUserItemsBookings(int userId, BookingState state) {
+        log.info("Запрос на получение всех бронирований по userId - {}", userId);
+        User user = getUserById(userId);
         Collection<Integer> itemIds = itemRepository.findAllByOwnerId(userId).stream()
                 .map(Item::getId)
                 .toList();
+        final Collection<Booking> bookings;
+        final LocalDateTime current = LocalDateTime.now();
+        switch (state) {
+            case WAITING -> {
+                bookings = bookingRepository.findAllByItemIdInAndStatusOrderByStartDesc(itemIds, BookingStatus.WAITING);
+            }
+            case REJECTED -> {
+                bookings = bookingRepository.findAllByItemIdInAndStatusOrderByStartDesc(itemIds, BookingStatus.REJECTED);
+            }
+            case CURRENT -> {
+                bookings = bookingRepository.findAllCurrentBookings(itemIds, current);
+            }
+            case PAST -> {
+                bookings = bookingRepository.findAllByItemIdInAndEndBeforeOrderByStartDesc(itemIds, current);
+            }
+            case FUTURE -> {
+                bookings = bookingRepository.findAllByItemIdInAndStartAfterOrderByStartDesc(itemIds, current);
+            }
+            case ALL -> {
+                bookings = bookingRepository.findAllByItemIdInOrderByStartDesc(itemIds);
+            }
+            default -> {
+                throw new NotValidException(BookingState.class, "invalid");
+            }
+        }
+        log.info("Все бронирования userId - {}, найдены - {}", userId, bookings);
+        return bookingMapper.map(bookings);
+    }
 
-        return getAllUserBookings(userId, state).stream()
-                .filter(booking -> itemIds.contains(booking.getItem().getId()))
-                .toList();
+    private User getUserById(int userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+    }
+
+    private Item getItemById(int itemId) {
+        return itemRepository.findById(itemId).orElseThrow(
+                () -> new ItemNotFoundException("Предмет с ID " + itemId + " не найден"));
+    }
+
+    private Booking getBookingById(int bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ItemNotFoundException("Бронирование  с ID " + bookingId + " не найдено"));
     }
 }
