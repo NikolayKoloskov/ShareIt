@@ -43,7 +43,6 @@ public class BookingServiceImpl implements BookingService {
             throw new NotValidException(Booking.class,
                     "Дата начала бронирования не может быть позже конца бронирования.");
         }
-
         booking.setBooker(user);
         booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
