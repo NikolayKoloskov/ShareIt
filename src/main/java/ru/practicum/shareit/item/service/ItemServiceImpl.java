@@ -52,6 +52,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto addComment(int userId, int itemId, CommentSaveDto commentSaveDto) {
+        User owner = userRepo.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+        Item item = itemRepo.findById(itemId).orElseThrow(
+                () -> new ItemNotFoundException("Предмет с id " + itemId + " не найден"));
         Booking booking = bookingRepo
                 .findByBookerIdAndItemIdAndEndBeforeOrderByStartDesc(userId, itemId, LocalDateTime.now())
                 .orElseThrow(() -> new NotValidException(Comment.class, "cannot be posted. Please check user id " +
