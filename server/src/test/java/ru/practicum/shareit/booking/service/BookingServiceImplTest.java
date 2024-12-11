@@ -40,7 +40,7 @@ class BookingServiceImplTest {
     private Item itemExpected;
     private User userExpected;
 
-    private final static int UNAVAILABLE_ID = 999;
+    private static final int UNAVAILABLE_ID = 999;
 
     @BeforeEach
     public void setUp() {
