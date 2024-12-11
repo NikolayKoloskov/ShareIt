@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,16 +20,14 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -87,9 +83,9 @@ class BookingControllerTest {
         when(service.addBooking(eq(userId), any(BookingSaveDto.class)))
                 .thenReturn(bookingExpected);
         mockMvc.perform(post("/bookings")
-                .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(bookingSaveDtoJson))
+                        .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookingSaveDtoJson))
                 .andExpect(status().isOk())
                 .andExpect(content().json(bookingExpectedJson));
 
@@ -110,9 +106,9 @@ class BookingControllerTest {
                 });
 
         mockMvc.perform(patch(path)
-                .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
-                .param("approved", String.valueOf(approved))
-                .accept(MediaType.APPLICATION_JSON))
+                        .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
+                        .param("approved", String.valueOf(approved))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(BookingStatus.APPROVED.name()));
 
@@ -130,8 +126,8 @@ class BookingControllerTest {
                 .thenReturn(bookingExpected);
 
         mockMvc.perform(get(path)
-                .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
-                .accept(MediaType.APPLICATION_JSON))
+                        .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingExpected)));
 
@@ -144,14 +140,14 @@ class BookingControllerTest {
         BookingState state = BookingState.REJECTED;
 
         when(service.getAllUserBookings(eq(userId), eq(state)))
-        .thenReturn(Collections.emptyList());
+                .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/bookings")
-                .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("state", String.valueOf(state))
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
+                        .header(RequestHttpHeaders.USER_ID, String.valueOf(userId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("state", String.valueOf(state))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
 
         verify(service, times(1)).getAllUserBookings(eq(userId), eq(state));
