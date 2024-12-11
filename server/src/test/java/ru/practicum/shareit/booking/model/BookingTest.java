@@ -16,7 +16,7 @@ class BookingTest {
     void testGetId() {
         Booking booking = new Booking();
         booking.setId(1);
-        assertEquals(1L, booking.getId());
+        assertEquals(1, booking.getId());
     }
 
     @Test
