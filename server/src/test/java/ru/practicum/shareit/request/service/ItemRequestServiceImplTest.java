@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestSaveDto;
@@ -106,5 +107,10 @@ class ItemRequestServiceImplTest {
                 hasProperty("id", equalTo(itemRequestExistedExpected.getId())),
                 hasProperty("description", equalTo(itemRequestExistedExpected.getDescription()))
         ));
+    }
+
+    @Test
+    void getItemRequestUnknownItemTest() {
+        assertThrows(ItemNotFoundException.class, () -> service.getItemRequest(NON_EXISTENT_ID));
     }
 }

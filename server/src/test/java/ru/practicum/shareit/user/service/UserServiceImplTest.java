@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserSaveDto;
 import ru.practicum.shareit.user.model.User;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
@@ -26,7 +28,7 @@ public class UserServiceImplTest {
     private UserDto userCreatedExpected;
     private UserDto userExistedExpected;
 
-    private static final long NON_EXISTENT_ID = 999;
+    private static final int NON_EXISTENT_ID = 999;
 
     @BeforeEach
     public void testInit() {
@@ -72,6 +74,12 @@ public class UserServiceImplTest {
     }
 
     @Test
+    void getUserNotExistingUserTest() {
+
+        assertThrows(UserNotFoundException.class, () -> service.getUser(NON_EXISTENT_ID));
+    }
+
+    @Test
     void updateUserTest() {
         int userId = 10;
         UserSaveDto userSaveDtoForUpdate = new UserSaveDto();
@@ -87,6 +95,11 @@ public class UserServiceImplTest {
                 hasProperty("name", equalTo(userSaveDtoForUpdate.getName())),
                 hasProperty("email", equalTo(userSaveDtoForUpdate.getEmail()))
         ));
+    }
+
+    @Test
+    void updateUserNotExistingUserTest() {
+        assertThrows(UserNotFoundException.class, () -> service.updateUser(NON_EXISTENT_ID, new UserSaveDto()));
     }
 
     @Test

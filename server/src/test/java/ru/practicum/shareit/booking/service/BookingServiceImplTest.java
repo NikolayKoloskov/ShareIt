@@ -13,6 +13,9 @@ import ru.practicum.shareit.booking.dto.BookingSaveDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.exceptions.ForbiddenException;
+import ru.practicum.shareit.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.exceptions.NotValidException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -23,6 +26,7 @@ import java.util.Collection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @SpringBootTest
@@ -35,6 +39,8 @@ class BookingServiceImplTest {
     private Booking bookingExpected;
     private Item itemExpected;
     private User userExpected;
+
+    private final static int UNAVAILABLE_ID = 999;
 
     @BeforeEach
     public void setUp() {
@@ -95,6 +101,45 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void addBookingNotAvailableTest() {
+
+        BookingSaveDto bookingSaveDto = new BookingSaveDto();
+        // When
+        bookingSaveDto.setItemId(UNAVAILABLE_ID);
+        bookingSaveDto.setStart(bookingExpected.getStart());
+        bookingSaveDto.setEnd(bookingExpected.getEnd());
+        // Then
+        assertThrows(ForbiddenException.class, () -> bookingService.addBooking(bookingExpected.getId(), bookingSaveDto));
+    }
+
+    @Test
+    void addBookingUserNotFoundTest() {
+        BookingSaveDto bookingSaveDto = new BookingSaveDto();
+        bookingSaveDto.setItemId(itemExpected.getId());
+        bookingSaveDto.setStart(bookingExpected.getStart());
+        bookingSaveDto.setEnd(bookingExpected.getEnd());
+        assertThrows(ForbiddenException.class, () -> bookingService.addBooking(UNAVAILABLE_ID, bookingSaveDto));
+    }
+
+    @Test
+    void addBookingItemNotAvailableTest() {
+        BookingSaveDto bookingSaveDto = new BookingSaveDto();
+        bookingSaveDto.setItemId(50);
+        bookingSaveDto.setStart(bookingExpected.getStart());
+        bookingSaveDto.setEnd(bookingExpected.getEnd());
+        assertThrows(NotValidException.class, () -> bookingService.addBooking(userExpected.getId(), bookingSaveDto));
+    }
+
+    @Test
+    void addBookingWrongDateTest() {
+        BookingSaveDto bookingSaveDto = new BookingSaveDto();
+        bookingSaveDto.setItemId(itemExpected.getId());
+        bookingSaveDto.setStart(bookingExpected.getEnd());
+        bookingSaveDto.setEnd(bookingExpected.getStart());
+        assertThrows(NotValidException.class, () -> bookingService.addBooking(userExpected.getId(), bookingSaveDto));
+    }
+
+    @Test
     void manageBookingTest() {
         int userId = 10;
         int bookingId = 10;
@@ -111,6 +156,14 @@ class BookingServiceImplTest {
                 hasProperty("booker", allOf(hasProperty("id", equalTo(bookerExpectedId)))),
                 hasProperty("status", equalTo(BookingStatus.APPROVED))
         ));
+    }
+
+    @Test
+    void manageBookingWrongUserTest() {
+        int userId = 10;
+        int bookingId = 20;
+        boolean approved = true;
+        assertThrows(NotValidException.class, () -> bookingService.manageBooking(userId, bookingId, approved));
     }
 
     @Test
@@ -151,51 +204,40 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllUserBookingsTest() {
-        int userId = 20;
-        BookingState state = BookingState.WAITING;
-
-        Collection<BookingDto> bookings = bookingService.getAllUserItemsBookings(userId, state);
-
-        bookings.forEach(booking -> assertThat(booking, allOf(
-                hasProperty("id", notNullValue()),
-                hasProperty("start", nullValue()),
-                hasProperty("end", nullValue()),
-                hasProperty("item", allOf(
-                        hasProperty("id", notNullValue()),
-                        hasProperty("name", notNullValue()),
-                        hasProperty("description", notNullValue()),
-                        hasProperty("available", notNullValue())
-                )),
-                hasProperty("booker", allOf(
-                        hasProperty("id", notNullValue()),
-                        hasProperty("email", notNullValue()),
-                        hasProperty("name", notNullValue())
-                )),
-                hasProperty("status", notNullValue()))
-        ));
+    void getBookingWrongUserTest() {
+        int userId = 50;
+        int bookingId = 10;
+        assertThrows(NotValidException.class, () -> bookingService.getBooking(userId, bookingId));
     }
 
     @Test
-    void getAllUserItemsBookingsTest() {
-        int userId = 20;
+    void addBookingWrongItemTest() {
+        BookingSaveDto bookingSaveDto = new BookingSaveDto();
+        bookingSaveDto.setItemId(UNAVAILABLE_ID);
+        bookingSaveDto.setEnd(bookingExpected.getEnd());
+        bookingSaveDto.setStart(bookingExpected.getStart());
+        assertThrows(ItemNotFoundException.class, () -> bookingService.addBooking(10, bookingSaveDto));
+    }
+
+    @Test
+    void getAllUserItemsBookingsWaitingTest() {
+        int userId = 10;
         BookingState state = BookingState.ALL;
 
         Collection<BookingDto> bookings = bookingService.getAllUserItemsBookings(userId, state);
+
+        assertThat(bookings, hasSize(3));
+    }
+
+    @Test
+    void getAllUserBookingsTest() {
+        int userId = 20;
+        BookingState state = BookingState.ALL;
+
+        Collection<BookingDto> bookings = bookingService.getAllUserBookings(userId, state);
         bookings.forEach(booking -> assertThat(booking, allOf(
-                hasProperty("id", notNullValue()),
-                hasProperty("start", nullValue()),
-                hasProperty("end", nullValue()),
-                hasProperty("item", allOf(
-                        hasProperty("id", notNullValue()),
-                        hasProperty("name", notNullValue()),
-                        hasProperty("description", notNullValue()),
-                        hasProperty("available", notNullValue())
-                )),
                 hasProperty("booker", allOf(
-                        hasProperty("id", notNullValue()),
-                        hasProperty("email", notNullValue()),
-                        hasProperty("name", notNullValue())
+                        hasProperty("id", equalTo(userId))
                 )),
                 hasProperty("status", notNullValue()))
         ));

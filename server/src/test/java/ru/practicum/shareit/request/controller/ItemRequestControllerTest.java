@@ -88,7 +88,6 @@ class ItemRequestControllerTest {
 
     @Test
     void getAllItemRequestsTest() throws Exception {
-
         int itemRequestId = itemRequestExpected.getId();
         String path = "/requests" + "/" + itemRequestId;
         String itemRequestExpectedJson = objectMapper.writeValueAsString(itemRequestExpected);
@@ -103,4 +102,19 @@ class ItemRequestControllerTest {
 
         verify(service, times(1)).getItemRequest(eq(itemRequestId));
     }
+
+    @Test
+    void getAllTest() throws Exception {
+        String path = "/requests" + "/" + "all";
+        when(service.getAllItemRequests())
+                .thenReturn(List.of());
+        // Then
+        mockMvc.perform(get(path)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+
+        verify(service, times(1)).getAllItemRequests();
+    }
+
 }

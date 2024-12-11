@@ -33,13 +33,6 @@ public class ExceptionResolver {
         return new ErrorResponseMessage("Item not found", e.getMessage());
     }
 
-    @ExceptionHandler(DublicatedDataException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponseMessage handleDublicatedUserException(DublicatedDataException e) {
-        log.error(e.getMessage());
-        return new ErrorResponseMessage("Dublicated user", e.getMessage());
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorResponseMessage handleValidationException(MethodArgumentNotValidException e) {
