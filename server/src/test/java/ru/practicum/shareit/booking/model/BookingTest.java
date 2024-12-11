@@ -22,15 +22,15 @@ class BookingTest {
     @Test
     void testGetStart() {
         Booking booking = new Booking();
-        booking.setStart(LocalDateTime.now());
-        assertEquals(LocalDateTime.now(), booking.getStart());
+        booking.setStart(LocalDateTime.of(2024,12,12,12,12,12));
+        assertEquals(LocalDateTime.of(2024,12,12,12,12,12), booking.getStart());
     }
 
     @Test
     void testGetEnd() {
         Booking booking = new Booking();
-        booking.setEnd(LocalDateTime.now().plusDays(1));
-        assertEquals(LocalDateTime.now().plusDays(1), booking.getEnd());
+        booking.setEnd(LocalDateTime.of(2024,12,15,12,12,12));
+        assertEquals(LocalDateTime.of(2024,12,15,12,12,12), booking.getEnd());
     }
 
     @Test
