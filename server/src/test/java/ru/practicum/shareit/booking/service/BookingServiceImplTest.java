@@ -105,7 +105,7 @@ class BookingServiceImplTest {
         Booking booking = query.setParameter("id", bookingId).getSingleResult();
         BookingDto bookingDto = mapper.map(booking);
 
-        long bookerExpectedId = 20;
+        int bookerExpectedId = 20;
         assertThat(bookingDto, allOf(
                 hasProperty("id", equalTo(bookingId)),
                 hasProperty("booker", allOf(hasProperty("id", equalTo(bookerExpectedId)))),
@@ -122,9 +122,9 @@ class BookingServiceImplTest {
 
         BookingDto bookingId10DtoExpected = new BookingDto();
         bookingId10DtoExpected.setId(10);
-        LocalDateTime start = LocalDateTime.of(2024, 11, 21, 10, 10, 10);
+        LocalDateTime start = LocalDateTime.of(2024, 12, 11, 10, 10, 10);
         bookingId10DtoExpected.setStart(start);
-        LocalDateTime end = LocalDateTime.of(2024, 11, 21, 11, 11, 11);
+        LocalDateTime end = LocalDateTime.of(2024, 12, 11, 11, 11, 11);
         bookingId10DtoExpected.setEnd(end);
         ItemDto item = new ItemDto();
         item.setId(10);
