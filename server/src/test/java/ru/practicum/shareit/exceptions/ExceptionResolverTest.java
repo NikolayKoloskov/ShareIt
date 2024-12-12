@@ -11,11 +11,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.api.RequestHttpHeaders;
 import ru.practicum.shareit.booking.controller.BookingController;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingSaveDto;
+import ru.practicum.shareit.user.controller.UserController;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ExceptionResolverTest {
     private final ObjectMapper objectMapper;
     private final BookingController bookingController;
-    private BookingDto bookingExpected;
+    private final UserController userController;
 
     @Test
     void handleItemNotFoundExceptionTest() throws Exception {
@@ -50,6 +51,19 @@ class ExceptionResolverTest {
 
     @Test
     void handleUserNotFoundException() throws Exception {
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                .setControllerAdvice(new ExceptionResolver())
+                .build();
+
+        mockMvc.perform(get("/users/222")
+                        .header(RequestHttpHeaders.USER_ID, 1)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(String.format("{\"error\":\"User not found\", \"message\": \"Пользователь с ID 222 не найден\"}")));
+    }
+
+    @Test
+    void handleForbiddenException() throws Exception {
         BookingSaveDto bookingSaveDto = new BookingSaveDto();
         bookingSaveDto.setItemId(10);
         bookingSaveDto.setStart(LocalDateTime.now());
@@ -69,10 +83,6 @@ class ExceptionResolverTest {
     }
 
     @Test
-    void handleBadRequestException() {
-    }
-
-    @Test
     void handleMissingRequestHeaderExceptionTest() throws Exception {
         BookingSaveDto bookingSaveDto = new BookingSaveDto();
         bookingSaveDto.setItemId(10);
@@ -88,14 +98,6 @@ class ExceptionResolverTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(String.format("{\"error\":\"Не передан Header X-Sharer-User-Id\", \"message\": \"Required request header 'X-Sharer-User-Id' for method parameter type int is not present\"}")));
 
-    }
-
-    @Test
-    void handleConstraintViolationException() {
-    }
-
-    @Test
-    void handleForbiddenException() {
     }
 
     @Test
