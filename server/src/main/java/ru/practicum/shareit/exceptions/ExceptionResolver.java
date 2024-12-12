@@ -3,16 +3,12 @@ package ru.practicum.shareit.exceptions;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.stream.Collectors;
 
 @Slf4j(topic = "ExceptionResolver")
 @RestControllerAdvice
@@ -31,17 +27,6 @@ public class ExceptionResolver {
     public ErrorResponseMessage handleItemNotFoundException(ItemNotFoundException e) {
         log.error(e.getMessage());
         return new ErrorResponseMessage("Item not found", e.getMessage());
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorResponseMessage handleValidationException(MethodArgumentNotValidException e) {
-        String message = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining(","));
-        return new ErrorResponseMessage("Validation Error", message);
     }
 
     @ExceptionHandler(BadRequestException.class)

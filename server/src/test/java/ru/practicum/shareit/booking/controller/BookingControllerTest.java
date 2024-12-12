@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookingControllerTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
+    private final BookingService bookingService;
 
     @MockBean
     private final BookingService service;

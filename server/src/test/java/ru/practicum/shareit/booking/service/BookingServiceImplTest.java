@@ -68,6 +68,16 @@ class BookingServiceImplTest {
 
     }
 
+    @Test
+    public void mappingTest() {
+        Booking booking = null;
+
+        BookingDto bookingDto = mapper.map(booking);
+        assertThat(bookingDto, equalTo(null));
+        BookingSaveDto bookingSaveDtoDto = null;
+        Booking booking1 = mapper.map(bookingSaveDtoDto);
+        assertThat(booking1, equalTo(null));
+    }
 
     @Test
     public void addBookingTest() {

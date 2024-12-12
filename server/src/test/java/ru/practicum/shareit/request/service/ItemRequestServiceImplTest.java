@@ -113,4 +113,14 @@ class ItemRequestServiceImplTest {
     void getItemRequestUnknownItemTest() {
         assertThrows(ItemNotFoundException.class, () -> service.getItemRequest(NON_EXISTENT_ID));
     }
+
+    @Test
+    void itemRequestMappingTest() {
+        ItemRequest itemRequest = null;
+        ItemRequestDto itemRequestDto = mapper.map(itemRequest);
+        assertEquals(itemRequestDto, null);
+        ItemRequestSaveDto itemRequestSaveDto = null;
+        ItemRequest itemRequest1 = mapper.map(itemRequestSaveDto);
+        assertEquals(itemRequest1, null);
+    }
 }

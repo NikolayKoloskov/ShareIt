@@ -224,4 +224,14 @@ class ItemServiceImplTest {
                 hasProperty("available", equalTo(itemExistedExpected.isAvailable()))
         ));
     }
+
+    @Test
+    void itemMapperTest() {
+        ItemSaveDto itemSaveDto = null;
+        Item item = itemMapper.map(itemSaveDto);
+        assertEquals(itemSaveDto, item);
+        ItemDto itemDto = itemMapper.map(item);
+        assertEquals(itemDto, item);
+
+    }
 }
