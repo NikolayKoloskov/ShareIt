@@ -1,15 +1,13 @@
 package ru.practicum.shareit.booking.model;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 class BookingTest {
 
     @Test
@@ -22,15 +20,15 @@ class BookingTest {
     @Test
     void testGetStart() {
         Booking booking = new Booking();
-        booking.setStart(LocalDateTime.of(2024,12,12,12,12,12));
-        assertEquals(LocalDateTime.of(2024,12,12,12,12,12), booking.getStart());
+        booking.setStart(LocalDateTime.of(2024, 12, 12, 12, 12, 12));
+        assertEquals(LocalDateTime.of(2024, 12, 12, 12, 12, 12), booking.getStart());
     }
 
     @Test
     void testGetEnd() {
         Booking booking = new Booking();
-        booking.setEnd(LocalDateTime.of(2024,12,15,12,12,12));
-        assertEquals(LocalDateTime.of(2024,12,15,12,12,12), booking.getEnd());
+        booking.setEnd(LocalDateTime.of(2024, 12, 15, 12, 12, 12));
+        assertEquals(LocalDateTime.of(2024, 12, 15, 12, 12, 12), booking.getEnd());
     }
 
     @Test

@@ -252,4 +252,46 @@ class BookingServiceImplTest {
                 hasProperty("status", notNullValue()))
         ));
     }
+
+    @Test
+    void getAllUserBookingsWaitingTest() {
+        int userId = 20;
+        BookingState state = BookingState.WAITING;
+
+        Collection<BookingDto> bookings = bookingService.getAllUserBookings(userId, state);
+        bookings.forEach(booking -> assertThat(booking, allOf(
+                hasProperty("booker", allOf(
+                        hasProperty("id", equalTo(userId))
+                )),
+                hasProperty("status", notNullValue())))
+        );
+    }
+
+    @Test
+    void getAllUserBookingsRejectedTest() {
+        int userId = 20;
+        BookingState state = BookingState.REJECTED;
+
+        Collection<BookingDto> bookings = bookingService.getAllUserBookings(userId, state);
+        bookings.forEach(booking -> assertThat(booking, allOf(
+                hasProperty("booker", allOf(
+                        hasProperty("id", equalTo(userId))
+                )),
+                hasProperty("status", notNullValue()))
+        ));
+    }
+
+    @Test
+    void getAllUserBookingsCurrentTest() {
+        int userId = 20;
+        BookingState state = BookingState.CURRENT;
+
+        Collection<BookingDto> bookings = bookingService.getAllUserBookings(userId, state);
+        bookings.forEach(booking -> assertThat(booking, allOf(
+                hasProperty("booker", allOf(
+                        hasProperty("id", equalTo(userId))
+                )),
+                hasProperty("status", notNullValue()))
+        ));
+    }
 }
