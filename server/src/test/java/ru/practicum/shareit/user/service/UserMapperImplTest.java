@@ -7,7 +7,6 @@ import ru.practicum.shareit.user.model.User;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class UserMapperImplTest {
-
     @Test
     void mapTest() {
         User user = null;
