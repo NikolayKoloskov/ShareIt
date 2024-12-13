@@ -30,8 +30,8 @@ public class ItemRequestClient extends BaseClient {
         return get("", userId);
     }
 
-    public ResponseEntity<Object> getAllItemRequests() {
-        return get(GET_ALL_ITEMS);
+    public ResponseEntity<Object> getAllItemRequests(Integer userId) {
+        return get(GET_ALL_ITEMS, userId);
     }
 
     public ResponseEntity<Object> getItemRequest(Integer requestId) {

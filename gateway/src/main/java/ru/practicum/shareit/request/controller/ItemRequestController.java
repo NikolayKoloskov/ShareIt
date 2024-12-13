@@ -31,8 +31,10 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllItemRequests() {
-        return itemRequestClient.getAllItemRequests();
+    public ResponseEntity<Object> getAllItemRequests(
+            @RequestHeader(RequestHttpHeaders.USER_ID) Integer userId
+    ) {
+        return itemRequestClient.getAllItemRequests(userId);
     }
 
 

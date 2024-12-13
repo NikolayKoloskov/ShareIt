@@ -88,7 +88,8 @@ class ItemRequestServiceImplTest {
     @Test
     void getAllItemRequestsTest() {
         int itemRequestExpectedId = 10;
-        Collection<ItemRequestDto> itemRequests = service.getAllItemRequests();
+        int userId = 10;
+        Collection<ItemRequestDto> itemRequests = service.getAllItemRequests(userId);
         assertEquals(itemRequests.size(), 5);
         for (ItemRequestDto request : itemRequests) {
             assertThat(request, allOf(

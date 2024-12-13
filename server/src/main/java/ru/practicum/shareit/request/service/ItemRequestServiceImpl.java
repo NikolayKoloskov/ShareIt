@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
@@ -11,12 +10,16 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestSaveDto;
+import ru.practicum.shareit.request.dto.ItemResponseToRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -45,13 +48,17 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public Collection<ItemRequestDto> getAllUserItemRequest(int userId) {
         log.info("Получение всех заявок пользователя с id - {}", userId);
-        return itemRequestMapper.map(itemRequestRepo.findAllByRequesterIdOrderByCreatedDesc(userId));
+        Collection<ItemRequestDto> result = itemRequestMapper.map(itemRequestRepo.findAllByRequesterIdOrderByCreatedDesc(userId));
+        return getRequestsWithItems(userId, result);
+
     }
 
     @Override
-    public Collection<ItemRequestDto> getAllItemRequests() {
-        log.info("Получение всех заявок");
-        return itemRequestMapper.map(itemRequestRepo.findAll(Sort.by(Sort.Direction.DESC, "created")));
+    public Collection<ItemRequestDto> getAllItemRequests(int userId) {
+        log.info("Получение всех заявок кроме пользователя с id - {}", userId);
+        Collection<ItemRequestDto> result = itemRequestMapper
+                .map(itemRequestRepo.findAllByRequester_IdNotInOrderByCreatedDesc(List.of(userId)));
+        return getRequestsWithItems(userId, result);
     }
 
     @Override
@@ -66,5 +73,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         itemRequestDto.setItems(itemMapper.mapToResponseToRequest(items));
         log.info("Найдена заявка {}", itemRequestDto);
         return itemRequestDto;
+    }
+
+    private Collection<ItemRequestDto> getRequestsWithItems(int userId, Collection<ItemRequestDto> result) {
+        Collection<Integer> itemsIds = itemRequestRepo.findAllByRequesterIdOrderByCreatedDesc(userId)
+                .stream()
+                .map(ItemRequest::getId)
+                .toList();
+        Collection<ItemResponseToRequestDto> items = itemRequestMapper.mapItems(itemRepo.findAllByIdIn(itemsIds));
+        Map<Integer, List<ItemResponseToRequestDto>> itemsMap = items.stream()
+                .collect(Collectors.groupingBy(ItemResponseToRequestDto::getId));
+        return result.stream()
+                .peek(itemRequest -> itemRequest.setItems(itemsMap.get(itemRequest.getId())))
+                .collect(Collectors.toList());
     }
 }

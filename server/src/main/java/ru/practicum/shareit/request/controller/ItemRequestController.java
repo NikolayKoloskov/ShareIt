@@ -28,8 +28,10 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public Collection<ItemRequestDto> getAllItemRequests() {
-        return itemRequestService.getAllItemRequests();
+    public Collection<ItemRequestDto> getAllItemRequests(
+            @RequestHeader(RequestHttpHeaders.USER_ID) Integer userId
+    ) {
+        return itemRequestService.getAllItemRequests(userId);
     }
 
     @GetMapping("/{requestId}")

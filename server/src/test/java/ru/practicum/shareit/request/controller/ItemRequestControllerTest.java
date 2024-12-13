@@ -106,7 +106,7 @@ class ItemRequestControllerTest {
     @Test
     void getAllTest() throws Exception {
         String path = "/requests" + "/" + "all";
-        when(service.getAllItemRequests())
+        when(service.getAllItemRequests(10))
                 .thenReturn(List.of());
         // Then
         mockMvc.perform(get(path)
@@ -114,7 +114,7 @@ class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
 
-        verify(service, times(1)).getAllItemRequests();
+        verify(service, times(1)).getAllItemRequests(10);
     }
 
 }
