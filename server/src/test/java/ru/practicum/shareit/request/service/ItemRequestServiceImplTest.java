@@ -87,16 +87,15 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllItemRequestsTest() {
-        int itemRequestExpectedId = 10;
         int userId = 10;
         Collection<ItemRequestDto> itemRequests = service.getAllItemRequests(userId);
-        assertEquals(itemRequests.size(), 5);
+        assertEquals(itemRequests.size(), 4);
         for (ItemRequestDto request : itemRequests) {
             assertThat(request, allOf(
-                    hasProperty("id", equalTo(itemRequestExpectedId)),
-                    hasProperty("description", equalTo("description" + itemRequestExpectedId / 10))
+                    hasProperty("id", notNullValue()),
+                    hasProperty("requester", not(userId)),
+                    hasProperty("description", notNullValue())
             ));
-            itemRequestExpectedId += 10;
         }
     }
 

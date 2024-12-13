@@ -110,7 +110,8 @@ class ItemRequestControllerTest {
                 .thenReturn(List.of());
         // Then
         mockMvc.perform(get(path)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(RequestHttpHeaders.USER_ID, 10))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
 
